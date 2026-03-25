@@ -1,0 +1,33 @@
+/* ── EJERCICIOS ── */
+
+/* MENSAJE DE ERROR EN FORMULARIOS */
+.error-msg {
+    color: rgb(220, 53, 69);
+    font-size: 12px;
+    margin-top: 5px;
+    margin-bottom: 0;
+}
+
+/* RESALTA EL INPUT CON ERROR */
+.form-input.input-error {
+    border-color: rgb(220, 53, 69);
+}
+
+/* BADGE DE VIDEO EN LA TABLA */
+.badge-video {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: linear-gradient(45deg, rgb(16, 137, 211), rgb(18, 177, 209));
+    color: white;
+    padding: 4px 10px;
+    border-radius: 8px;
+    font-size: 12px;
+    text-decoration: none;
+    transition: all 0.2s;
+}
+
+.badge-video:hover {
+    transform: scale(1.05);
+    color: white;
+}

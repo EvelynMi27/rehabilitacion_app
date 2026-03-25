@@ -1,0 +1,68 @@
+/* CSS DEL DASHBOARD */
+
+*{
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+}
+.dashboard-container{
+    max-width: 1100px;    /* limita el ancho */
+    margin: 0 auto;
+    width: 100%;
+}
+.dashboard-title{
+    font-size: 28px;
+    font-weight: 800;
+    color: rgb(6, 59, 74);
+    margin-bottom: 30px;
+     text-align: center; 
+}
+
+/* TARJETAS CON GRID */
+.dashboard-cards{
+    display: grid;
+    grid-template-columns: repeat(3,1fr);
+    gap: 20px;
+}
+
+/* TARJETAS POR SI SOLAS */
+.dashboard-card{
+    background: linear-gradient(0deg, rgb(208, 225, 241) 0%, rgb(211, 228, 250) 100%);
+    border-radius: 20px;
+    padding: 30px 20px;
+    text-align: center;
+    text-decoration: none;
+    color: rgb(6,59,74);
+    border: 3px solid white;
+    box-shadow: rgba(124, 147, 158, 0.878) 0px 15px 20px -10px;
+    transition: all 0.2s ease-in-out;
+}
+/* HOVER DE LAS CARDS */
+.dashboard-card:hover{
+    transform: scale(1.03);
+    box-shadow: rgba(124, 147, 158, 0.878) 0px 15px 20px -10px;
+    color: rgb(6,59,74);
+}
+
+/* ICONO DE LA TARJETA */
+.card-icon{
+    font-size: 45px;
+    margin-bottom: 15px;
+    color: rgb(22, 150, 230);
+}
+.dashboard-card h3{
+    font-weight: 800;
+    font-size: 20px;
+    margin-bottom: 8px;
+}
+.dashboard-card p{
+    font-size: 15px;
+    color: rgb(80, 79, 83);
+}
+
+/* REPONSIVE EN PANTLLAS PEQUEÑAS */
+@media (max-width: 768px){
+    .dashboard-cards{
+        grid-template-columns: 1fr;
+    }
+}
