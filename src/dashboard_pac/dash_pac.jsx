@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { FaCheckCircle, FaCircle, FaDumbbell, FaClock, FaFire, FaChevronDown, FaChevronUp } from "react-icons/fa";
 import './paciente.css';
+import { useNavigate } from "react-router-dom";
 
 // Datos de ejemplo
 const rutinasMock = [
@@ -46,6 +47,13 @@ const rutinasMock = [
 export default function PacienteDashboardPage() {
   const [rutinas, setRutinas] = useState(rutinasMock);
   const [expandida, setExpandida] = useState(null);
+    const navigate = useNavigate();
+
+  const cerrarSesion = () => {
+    localStorage.removeItem("token");
+    navigate("/");
+  };
+
 
   const toggleExpand = (id) => {
     setExpandida((prev) => (prev === id ? null : id));
@@ -97,6 +105,10 @@ export default function PacienteDashboardPage() {
               <div className="pac-barra-fill" style={{ width: `${progreso}%` }} />
             </div>
             <span className="pac-progreso-pct">{progreso}%</span>
+                {/* BOTÓN CERRAR SESIÓN */}
+          <button className="pac-logout-btn" onClick={cerrarSesion}>
+            Cerrar sesión
+          </button>
           </div>
         </div>
 
