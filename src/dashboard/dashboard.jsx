@@ -25,12 +25,6 @@ export default function DashboardPage(){
                 <p className="texto">Ver, crear, editar y eliminar rutinas</p>
                 </a>
 
-                {/* EJERCICIOS */}
-                 <a href="/ejercicios" className="dashboard-card">
-                <FaClipboardList className="card-icon"/>
-                <h3>Ejercicios</h3>
-                <p className="texto">Ver, crear, editar y eliminar ejercicios</p>
-                </a>
             </div>
         </div></>
     )

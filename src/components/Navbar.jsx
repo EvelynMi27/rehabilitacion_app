@@ -19,7 +19,6 @@ function NavbarFunction() {
           <Nav className="me-auto">
             <Nav.Link href="/dash">Inicio</Nav.Link>
             <Nav.Link href="/rutinas">Rutinas</Nav.Link>
-            <Nav.Link href="/ejercicios">Ejercicios</Nav.Link>
           </Nav>
           <Nav>
             <Button variant='outline-light' onClick={handleLogout}>Cerrar sesion</Button>

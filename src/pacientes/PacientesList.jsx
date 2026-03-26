@@ -2,16 +2,25 @@
 import NavbarFunction from "../components/Navbar";
 import { FaEdit, FaTrash } from "react-icons/fa";
 import './pacientes.css';
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import api from "../api/axios";
 
 export default function PacientesList() {
 
     // DATOS DE EJEMPLO (se reemplazarán con datos reales de la BD)
-    const [pacientes, setPacientes] = useState([
-        { id: 1, nombre: "Juan Pérez", correo: "juan@gmail.com", rutinas_ids: [1, 2] },
-        { id: 2, nombre: "María López", correo: "maria@gmail.com",  rutinas_ids: [3] },
-        { id: 3, nombre: "Carlos Soto", correo: "carlos@gmail.com", rutinas_ids: [] },
-    ]);
+    const [pacientes, setPacientes] = useState([]);
+
+    useEffect(()=>{
+        const cargarPacientes=async()=>{
+            try{
+                const response=await api.get('/pacientes');
+                setPacientes(response.data.data || response.data);
+            }catch(error){
+                console.error("Error al cargar la lista de pacientes", error);
+            }
+        };
+        cargarPacientes();
+    }, []);
 
     // FUNCIÓN PARA ELIMINAR UN PACIENTE --ELIMINAR SI NO ES NECESARIA
     const eliminarPaciente = (id) => {
@@ -46,12 +55,12 @@ export default function PacientesList() {
                         {pacientes.map((paciente) => (
                             <tr key={paciente.id}>
                                 <td>{paciente.id}</td>
-                                <td>{paciente.nombre}</td>
-                                <td>{paciente.correo}</td>
+                                <td>{paciente.name}</td>
+                                <td>{paciente.email}</td>
 
 
                                 {/* CANTIDAD DE RUTINAS ASIGNADAS */}
-                                <td>{paciente.rutinas_ids.length} rutinas</td>
+                                <td>{paciente.rutinas_asignadas?.length || 0} rutinas</td>
 
                                 <td className="acciones">
                                     {/* BOTÓN EDITAR RUTINAS — solo se puede editar las rutinas asignadas */}
@@ -65,6 +74,13 @@ export default function PacientesList() {
                                 </td>
                             </tr>
                         ))}
+                        {pacientes.length === 0 && (
+                            <tr>
+                                <td colSpan="5" style={{ textAlign: "center", padding: "20px" }}>
+                                    No hay pacientes registrados aún.
+                                </td>
+                            </tr>
+                        )}
                     </tbody>
                 </table>
 
