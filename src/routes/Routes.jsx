@@ -13,6 +13,7 @@ import EditarPaciente from "../pacientes/PacientesEditar.jsx";
 import EjerciciosList from "../ejercicios/ejerciciosList.jsx";
 import NuevoEjercicio from "../ejercicios/ejerciciosCrear.jsx";
 import EditarEjercicio from "../ejercicios/ejerciciosEditar.jsx";
+import PacienteDashboardPage from "../dashboard_pac/dash_pac.jsx";
 
 
 // EXPORTAMOS LAS RUTAS
@@ -40,6 +41,9 @@ export default function AppRouter(){
             <Route path="/ejercicios" element={<EjerciciosList/>}/>
             <Route path="/ejercicios/nuevo" element={<NuevoEjercicio/>}/>
             <Route path="/ejercicios/editar/:id" element={<EditarEjercicio/>}/>
+
+            {/*Dashboard del paciente */}
+            <Route path="/dash_pac" element={<PacienteDashboardPage/>}></Route>
         </Routes>
         </BrowserRouter>
     )

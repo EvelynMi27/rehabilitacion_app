@@ -2,24 +2,34 @@
 import NavbarFunction from "../components/Navbar";
 import { FaPlus, FaEdit, FaTrash } from "react-icons/fa";
 import './rutinas.css';
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import api from "../api/axios";
 
 export default function RutinasList() {
 
     // DATOS DE EJEMPLO (se reemplazarán con datos reales de la BD)
-    const [ rutinas, setRutinas]  = useState([
-        { id: 1, nombre: "Rutina de hombro", descripcion: "Ejercicios para rehabilitación de hombro", ejercicios_id: [1,2,3,4]},
-        { id: 2, nombre: "Rutina de rodilla", descripcion: "Ejercicios para rehabilitación de la rodilla", ejercicios_id: [5,6,10] },
-        { id: 3, nombre: "Rutina de mano", descripcion: "Ejercicios para rehabilitación de mano" ,ejercicios_id: [7,8,9]},
-    ]);
+    const [ rutinas, setRutinas]  = useState([]);
 
+    useEffect(()=>{
+        api.get('/rutinas')
+        .then(res=>{
+            setRutinas(res.data.data || res.data);
+        })
+        .catch(err=>console.error("Error al cargar rutinas", err));
+    }, []);
     // FUNCION PARQA ELIMIANR
-    const eliminarRutina = (id) =>{
+    const eliminarRutina = async(id) =>{
         // CONFIRMAR
         const confirmar = window.confirm("¿Estás seguro de eliminar esta rutina?");
         if(confirmar){
-            // Filtramos y eliminamos
-            setRutinas(rutinas.filter((rutina) => rutina.id !==id));
+            try{
+                await api.delete(`/rutinas/${id}`);
+                setRutinas(rutinas.filter((rutina)=>(rutina.id_rutina || rutina.id) !== id));
+                alert("Rutina eliminada");
+            }catch(error){
+                alert("Error al eliminar rutina");
+                console.error(error);
+            }
         }
     };
 
@@ -41,7 +51,7 @@ export default function RutinasList() {
                     <thead>
                         <tr>
                             <th>#</th>
-                            <th>Nombre</th>
+                            <th>Titulo</th>
                             <th>Descripción</th>
                             <th>Ejercicios</th>
                             <th>Acciones</th>
@@ -50,18 +60,18 @@ export default function RutinasList() {
                     <tbody>
                         {/* MAPEO DEL ARREGLO DE RUTINAS */}
                         {rutinas.map((rutina) => (
-                            <tr key={rutina.id}>
-                                <td>{rutina.id}</td>
-                                <td>{rutina.nombre}</td>
+                            <tr key={rutina.id_rutina || rutina.id}>
+                                <td>{rutina.id_rutina || rutina.id}</td>
+                                <td>{rutina.titulo}</td>
                                 <td>{rutina.descripcion}</td>
-                                <td>{rutina.ejercicios_id.length}</td>
+                                <td>{rutina.ejercicios?.length || 0}</td>
                                 <td className="acciones">
                                     {/* BOTÓN EDITAR */}
-                                    <a href={`/rutinas/editar/${rutina.id}`} className="btn-editar">
+                                    <a href={`/rutinas/editar/${rutina.id_rutina || rutina.id}`} className="btn-editar">
                                         <FaEdit /> Editar
                                     </a>
                                     {/* BOTÓN ELIMINAR */}
-                                    <button className="btn-eliminar" onClick={() => eliminarRutina(rutina.id)}>
+                                    <button className="btn-eliminar" onClick={() => eliminarRutina(rutina.id_rutina || rutina.id)}>
                                         <FaTrash /> Eliminar
                                     </button>
                                 </td>

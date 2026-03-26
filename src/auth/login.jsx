@@ -19,9 +19,17 @@ export default function LoginPage() {
                 email:email,
                 password:password
             });
-
-            localStorage.setItem('token', response.data.token);
-            navigate("/dash");
+            console.log("Datos del backend:",response.data);
+            localStorage.setItem('token', response.data.data.token);
+            const rolUsuario=response.data.data.user.rol;
+            localStorage.setItem('rol', rolUsuario);
+            if(rolUsuario==='fisio'){
+                navigate("/dash");
+            }else if(rolUsuario === 'paciente'){
+                navigate("/dash_pac");
+            }else{
+                setError('Rol no reconocido');
+            }
         }catch(err){
             setError(err.response?.data?.message || 'Correo o contraseña incorrectos');
         }

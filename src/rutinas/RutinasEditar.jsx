@@ -1,48 +1,43 @@
 // PÁGINA PARA EDITAR UNA RUTINA
 import NavbarFunction from "../components/Navbar";
 import { FaArrowLeft, FaSave, FaPlus, FaTrash } from "react-icons/fa";
-import { useState } from "react";
-import { useParams } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 import './rutinas.css';
 
 export default function EditarRutina() {
 
     // OBTENEMOS EL ID DE LA URL (/rutinas/editar/1)
     const { id } = useParams();
+    const navigate=useNavigate();
+    const[nombre, setNombre]=useState("");
+    const[descripcion, setDescripcion]=useState("");
+    const[ejerciciosSeleccionados, setEjerciciosSeleccionados]=useState([]);
+    const[ejerciciosDisponibles, setEjerciciosDisponibles]=useState([]);
+    const[cargando, setCargando]=useState(true);
 
-    // DATOS DE EJEMPLO (luego vendrán de la BD según el id)
-    const rutinaInicial = {
-        1: { nombre: "Rutina de hombro", descripcion: "Ejercicios para rehabilitación de hombro", ejercicios_id: [1, 2, 3, 4] },
-        2: { nombre: "Rutina de rodilla", descripcion: "Ejercicios para rehabilitación de la rodilla", ejercicios_id: [5, 6, 10] },
-        3: { nombre: "Rutina de mano", descripcion: "Ejercicios para rehabilitación de mano", ejercicios_id: [7, 8, 9] },
-    };
+    useEffect(()=>{
+        const cargarDatos= async ()=>{
+            try{
+                const [resEjercicios, resRutina]= await Promise.all([
+                    api.get('/ejercicios'),
+                    api.get(`/rutinas/${id}`)
+                ]);
 
-    // EJERCICIOS DISPONIBLES (luego vendrán de la BD)
-    const ejerciciosDisponibles = [
-        { id: 1, nombre: "Elevación de brazo" },
-        { id: 2, nombre: "Flexión de rodilla" },
-        { id: 3, nombre: "Rotación de hombro" },
-        { id: 4, nombre: "Extensión de muñeca" },
-        { id: 5, nombre: "Estiramiento lumbar" },
-        { id: 6, nombre: "Fortalecimiento de cuádriceps" },
-        { id: 7, nombre: "Apertura de dedos" },
-        { id: 8, nombre: "Flexión de muñeca" },
-        { id: 9, nombre: "Pinza digital" },
-        { id: 10, nombre: "Sentadilla asistida" },
-    ];
-
-    // CARGAMOS LOS DATOS DE LA RUTINA A EDITAR
-    const rutina = rutinaInicial[id];
-
-    // ESTADOS CON LOS VALORES ACTUALES DE LA RUTINA
-    const [nombre, setNombre] = useState(rutina?.nombre || "");
-    const [descripcion, setDescripcion] = useState(rutina?.descripcion || "");
-
-    // EJERCICIOS YA ASIGNADOS A LA RUTINA
-    const [ejerciciosSeleccionados, setEjerciciosSeleccionados] = useState(
-        ejerciciosDisponibles.filter((e) => rutina?.ejercicios_id.includes(e.id))
-    );
-
+                setEjerciciosDisponibles(resEjercicios.data.data || resEjercicios.data);
+                const dataRutina=resRutina.data.data || resRutina.data;
+                setNombre(dataRutina.titulo);
+                setDescripcion(dataRutina.descripcion);
+                setEjerciciosSeleccionados(dataRutina.ejercicios || []);
+            }catch(error){
+                console.error("Error al cargar datos", error);
+                alert("No se pudo cargar la informacion");
+            }finally{
+                setCargando(false);
+            }
+        };
+        cargarDatos();
+    }, [id]);
     // AGREGAR EJERCICIO (evita duplicados)
     const agregarEjercicio = (ejercicio) => {
         const yaAgregado = ejerciciosSeleccionados.find((e) => e.id === ejercicio.id);
@@ -51,12 +46,12 @@ export default function EditarRutina() {
     };
 
     // QUITAR EJERCICIO
-    const quitarEjercicio = (id) => {
-        setEjerciciosSeleccionados(ejerciciosSeleccionados.filter((e) => e.id !== id));
+    const quitarEjercicio = (ejercicioId) => {
+        setEjerciciosSeleccionados(ejerciciosSeleccionados.filter((e) => e.id !== ejercicioId));
     };
 
     // GUARDAR CAMBIOS (por ahora solo muestra en consola)
-    const guardarCambios = () => {
+    const guardarCambios = async () => {
         if (!nombre.trim()) {
             alert("El nombre de la rutina es obligatorio");
             return;
@@ -66,29 +61,23 @@ export default function EditarRutina() {
             return;
         }
 
-        // AQUÍ IRÁ LA PETICIÓN PUT/PATCH A LA BD
-        console.log({
-            id,
-            nombre,
-            descripcion,
-            ejercicios_ids: ejerciciosSeleccionados.map((e) => e.id)
-        });
+        try{
+            await api.put(`/rutinas/${id}`,{
+                titulo: nombre,
+                descripcion:descripcion,
+                ejercicios_ids:ejerciciosSeleccionados.map((e)=>e.id)
+            });
 
-        alert("Rutina actualizada correctamente");
+            alert("Rutina actualizada correctamente");
+            navigate("/rutinas");
+        }catch(error){
+            console.error(error);
+            alert("Error al actualizar la rutina");
+        }
+        
     };
 
-    // SI NO EXISTE LA RUTINA
-    if (!rutina) {
-        return (
-            <>
-                <NavbarFunction />
-                <div className="rutinas-container">
-                    <p>Rutina no encontrada.</p>
-                    <a href="/rutinas" className="btn-regresar"><FaArrowLeft /> Regresar</a>
-                </div>
-            </>
-        );
-    }
+    if(cargando) return <p style={{textAlign:'center', marginTop:'50px'}}>Cargando...</p>
 
     return (
         <>
