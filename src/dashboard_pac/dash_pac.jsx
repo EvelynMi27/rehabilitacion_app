@@ -3,7 +3,6 @@ import { FaCheckCircle, FaCircle, FaDumbbell, FaClock, FaFire, FaChevronDown, Fa
 import { useNavigate } from "react-router-dom";
 import api from "../api/axios";
 import './paciente.css';
-import { useNavigate } from "react-router-dom";
 
 const getYoutubeEmbedUrl=(url)=>{
     if(!url) return null;
@@ -18,7 +17,6 @@ const getYoutubeEmbedUrl=(url)=>{
 export default function PacienteDashboardPage() {
   const [rutinas, setRutinas] = useState([]);
   const [expandida, setExpandida] = useState(null);
-<<<<<<< HEAD
   const[cargando, setCargando]=useState(true);
 const navigate=useNavigate();
   useEffect(()=>{
@@ -41,30 +39,43 @@ const navigate=useNavigate();
     cargarMisRutinas();
   },[navigate]);
 
-    const navigate = useNavigate();
-
-  const cerrarSesion = () => {
-    localStorage.removeItem("token");
-    navigate("/");
-  };
-
-
   const toggleExpand = (id) => {
     setExpandida((prev) => (prev === id ? null : id));
   };
 
-  const marcarEjercicio = (rutinaId, ejercicioId) => {
-    setRutinas((prev) =>{
-      const rutinasActualizadas=prev.map((r) => {
-        if (r.id !== rutinaId) return r;
-        const ejerciciosActualizados = r.ejercicios.map((e) =>
-          e.id === ejercicioId ? { ...e, completado: !e.completado } : e
-        );
-        const todasCompletas = ejerciciosActualizados.every((e) => e.completado);
-        return { ...r, ejercicios: ejerciciosActualizados, completada: todasCompletas };
-      });
-      return rutinasActualizadas.filter((r)=>!r.completada);
-  });
+  const marcarEjercicio = async (rutinaId, ejercicioId) => {
+    
+    // 1. Buscamos la rutina exacta que el paciente está tocando
+    const rutinaActual = rutinas.find(r => r.id === rutinaId);
+    if (!rutinaActual) return;
+
+    // 2. Calculamos el nuevo estado ANTES de decírselo a React
+    const ejerciciosActualizados = rutinaActual.ejercicios.map(e =>
+        e.id === ejercicioId ? { ...e, completado: !e.completado } : e
+    );
+
+    // 3. Verificamos si con este clic ya completó todos
+    const todasCompletas = ejerciciosActualizados.every(e => e.completado);
+
+    // 4. Actualizamos la pantalla de React con el cálculo exacto
+    setRutinas(prev => prev.map(r =>
+        r.id === rutinaId ? { ...r, ejercicios: ejerciciosActualizados, completada: todasCompletas } : r
+    ));
+
+    // 5. Si ya están todas, hacemos la petición a tu API de Laravel
+    if (todasCompletas) {
+        try {
+            await api.put(`/mis-rutinas/${rutinaId}/completar`);
+            
+            // Si Laravel responde "Success", felicitamos y la quitamos de la lista
+            alert("¡Felicidades! 🎉 Has completado la rutina con éxito.");
+            setRutinas(prev => prev.filter(r => r.id !== rutinaId));
+            
+        } catch (error) {
+            console.error("Error al completar la rutina:", error);
+            alert("No se pudo guardar en la base de datos. Avisa a tu fisio.");
+        }
+    }
   };
 
   const handleLogout=()=>{
@@ -86,22 +97,8 @@ const navigate=useNavigate();
         <div className="pac-header">
           <div>
             <p className="pac-saludo">¡Hola de nuevo 👋</p>
-<<<<<<< HEAD
-            <h1 className="pac-titulo">Mis rutinas pendientes</h1>
-=======
+
             <h1 className="pac-titulo">Mis rutinas asignadas</h1>
-          </div>
-          <div className="pac-progreso-wrap">
-            <span className="pac-progreso-label">{completadas}/{rutinas.length} completadas</span>
-            <div className="pac-barra-bg">
-              <div className="pac-barra-fill" style={{ width: `${progreso}%` }} />
-            </div>
-            <span className="pac-progreso-pct">{progreso}%</span>
-                {/* BOTÓN CERRAR SESIÓN */}
-          <button className="pac-logout-btn" onClick={cerrarSesion}>
-            Cerrar sesión
-          </button>
->>>>>>> 739028162223b12823ca057c1653afd312bfb56c
           </div>
           <button 
             onClick={handleLogout} 
@@ -114,6 +111,7 @@ const navigate=useNavigate();
           >
             <FaSignOutAlt /> Salir
           </button>
+
         </div>
 
         {/* LISTA DE RUTINAS */}
