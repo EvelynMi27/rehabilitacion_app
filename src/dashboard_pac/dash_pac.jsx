@@ -3,6 +3,7 @@ import { FaCheckCircle, FaCircle, FaDumbbell, FaClock, FaFire, FaChevronDown, Fa
 import { useNavigate } from "react-router-dom";
 import api from "../api/axios";
 import './paciente.css';
+import { useNavigate } from "react-router-dom";
 
 const getYoutubeEmbedUrl=(url)=>{
     if(!url) return null;
@@ -17,6 +18,7 @@ const getYoutubeEmbedUrl=(url)=>{
 export default function PacienteDashboardPage() {
   const [rutinas, setRutinas] = useState([]);
   const [expandida, setExpandida] = useState(null);
+<<<<<<< HEAD
   const[cargando, setCargando]=useState(true);
 const navigate=useNavigate();
   useEffect(()=>{
@@ -38,6 +40,14 @@ const navigate=useNavigate();
     };
     cargarMisRutinas();
   },[navigate]);
+
+    const navigate = useNavigate();
+
+  const cerrarSesion = () => {
+    localStorage.removeItem("token");
+    navigate("/");
+  };
+
 
   const toggleExpand = (id) => {
     setExpandida((prev) => (prev === id ? null : id));
@@ -76,7 +86,22 @@ const navigate=useNavigate();
         <div className="pac-header">
           <div>
             <p className="pac-saludo">¡Hola de nuevo 👋</p>
+<<<<<<< HEAD
             <h1 className="pac-titulo">Mis rutinas pendientes</h1>
+=======
+            <h1 className="pac-titulo">Mis rutinas asignadas</h1>
+          </div>
+          <div className="pac-progreso-wrap">
+            <span className="pac-progreso-label">{completadas}/{rutinas.length} completadas</span>
+            <div className="pac-barra-bg">
+              <div className="pac-barra-fill" style={{ width: `${progreso}%` }} />
+            </div>
+            <span className="pac-progreso-pct">{progreso}%</span>
+                {/* BOTÓN CERRAR SESIÓN */}
+          <button className="pac-logout-btn" onClick={cerrarSesion}>
+            Cerrar sesión
+          </button>
+>>>>>>> 739028162223b12823ca057c1653afd312bfb56c
           </div>
           <button 
             onClick={handleLogout} 

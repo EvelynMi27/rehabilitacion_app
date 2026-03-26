@@ -300,3 +300,16 @@
     font-size: 14px;
   }
 }
+.pac-logout-btn {
+  margin-top: 10px;
+  padding: 6px 10px;
+  background: #dc3545;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.pac-logout-btn:hover {
+  background: #b02a37;
+}
