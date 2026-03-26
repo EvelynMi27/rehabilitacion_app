@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { FaCheckCircle, FaCircle, FaDumbbell, FaClock, FaFire, FaChevronDown, FaChevronUp } from "react-icons/fa";
-import NavbarFunction from "../components/Navbar";
 import './paciente.css';
 
 // Datos de ejemplo
@@ -84,7 +83,6 @@ export default function PacienteDashboardPage() {
 
   return (
     <>
-      <NavbarFunction />
       <div className="pac-container">
 
         {/* ENCABEZADO */}

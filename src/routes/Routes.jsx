@@ -9,10 +9,6 @@ import RutinasList from "../rutinas/RutinasList.jsx";
 import NuevaRutina from "../rutinas/RutinasCrear.jsx";
 import EditarRutina from "../rutinas/RutinasEditar.jsx";
 import PacientesList from "../pacientes/PacientesList.jsx";
-import EditarPaciente from "../pacientes/PacientesEditar.jsx";
-import EjerciciosList from "../ejercicios/ejerciciosList.jsx";
-import NuevoEjercicio from "../ejercicios/ejerciciosCrear.jsx";
-import EditarEjercicio from "../ejercicios/ejerciciosEditar.jsx";
 import PacienteDashboardPage from "../dashboard_pac/dash_pac.jsx";
 
 
@@ -35,12 +31,6 @@ export default function AppRouter(){
             <Route path="/rutinas/editar/:id" element={<EditarRutina />} />
             {/* PACIENTES */}
             <Route path="/pacientes" element={<PacientesList/>}/>
-            <Route path="/pacientes/editar/:id" element={<EditarPaciente/>}/>
-
-            {/* EJERCICIOS */}
-            <Route path="/ejercicios" element={<EjerciciosList/>}/>
-            <Route path="/ejercicios/nuevo" element={<NuevoEjercicio/>}/>
-            <Route path="/ejercicios/editar/:id" element={<EditarEjercicio/>}/>
 
             {/*Dashboard del paciente */}
             <Route path="/dash_pac" element={<PacienteDashboardPage/>}></Route>
