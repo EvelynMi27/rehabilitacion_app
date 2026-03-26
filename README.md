@@ -6,22 +6,27 @@
 
 <p align="center">
   <img src="https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=white" alt="React" />
-  <img src="https://img.shields.io/badge/Vite-6-646CFF?logo=vite&logoColor=white" alt="Vite" />
-  <img src="https://img.shields.io/badge/Axios-HTTP-5A29E4?logo=axios&logoColor=white" alt="Axios" />
-  <img src="https://img.shields.io/badge/React_Router-6-CA4245?logo=reactrouter&logoColor=white" alt="React Router" />
+  <img src="https://img.shields.io/badge/Vite-8-646CFF?logo=vite&logoColor=white" alt="Vite" />
+  <img src="https://img.shields.io/badge/Axios-1.x-5A29E4?logo=axios&logoColor=white" alt="Axios" />
+  <img src="https://img.shields.io/badge/React_Router-7-CA4245?logo=reactrouter&logoColor=white" alt="React Router" />
+  <img src="https://img.shields.io/badge/Bootstrap-5-7952B3?logo=bootstrap&logoColor=white" alt="Bootstrap" />
 </p>
 
-Aplicación web desarrollada en **React + Vite** que consume la **MotriCare REST API**. Permite a fisioterapeutas y pacientes gestionar rutinas y ejercicios de rehabilitación motriz.
+Aplicación web desarrollada en **React + Vite** que consume la **MotriCare REST API**. Permite a fisioterapeutas gestionar rutinas y pacientes, y a pacientes visualizar sus rutinas de rehabilitación asignadas.
 
 ---
 
 ## 🛠️ Tecnologías utilizadas
 
-- **React 19** — Librería de interfaces de usuario
-- **Vite 6** — Bundler y servidor de desarrollo
-- **Axios** — Cliente HTTP para consumir la API
-- **React Router 6** — Navegación entre vistas
-- **React Icons** — Íconos (FaUser, FaLock, FaArrowLeft, etc.)
+| Tecnología | Versión | Uso |
+|---|---|---|
+| React | ^19.2.4 | Librería principal de UI |
+| Vite | ^8.0.1 | Bundler y servidor de desarrollo |
+| React Router DOM | ^7.13.2 | Navegación entre vistas |
+| Axios | ^1.13.6 | Cliente HTTP para consumir la API |
+| Bootstrap | ^5.3.8 | Estilos y componentes UI |
+| React Bootstrap | ^2.10.10 | Componentes Bootstrap para React |
+| React Icons | ^5.6.0 | Íconos (FaUser, FaLock, FaEdit, etc.) |
 
 ---
 
@@ -36,34 +41,29 @@ rehabilitacion_app/
 │   ├── api/
 │   │   └── axios.js               # Configuración base de Axios + interceptor de token
 │   ├── assets/
-│   │   ├── hero.png
-│   │   ├── react.svg
-│   │   └── vite.svg
+│   │   └── hero.png
 │   ├── auth/
 │   │   ├── auth.css
-│   │   ├── login.jsx              # Inicio de sesión (POST /login)
-│   │   └── register.jsx           # Registro de usuario (POST /registro)
+│   │   ├── login.jsx              # Inicio de sesión → POST /login
+│   │   └── register.jsx           # Registro de usuario → POST /registro
 │   ├── components/
-│   │   └── Navbar.jsx             # Barra de navegación
+│   │   └── Navbar.jsx             # Barra de navegación compartida
 │   ├── dashboard/
 │   │   ├── dashboard.css
-│   │   └── dashboard.jsx          # Panel principal
-│   ├── ejercicios/
-│   │   ├── ejercicios.css
-│   │   ├── ejerciciosCrear.jsx    # Crear ejercicio (POST /ejercicios)
-│   │   ├── ejerciciosEditar.jsx   # Editar ejercicio
-│   │   └── ejerciciosList.jsx     # Listar ejercicios (GET /ejercicios)
+│   │   └── dashboard.jsx          # Panel principal del fisioterapeuta
+│   ├── dashboard_pac/
+│   │   ├── paciente.css
+│   │   └── dash_pac.jsx           # Dashboard del paciente → GET /mis-rutinas/{id}
 │   ├── pacientes/
 │   │   ├── pacientes.css
-│   │   ├── PacientesEditar.jsx    # Editar paciente
-│   │   └── PacientesList.jsx      # Listar pacientes
+│   │   └── PacientesList.jsx      # Listar y eliminar pacientes
 │   ├── routes/
-│   │   └── Routes.jsx             # Definición de rutas
+│   │   └── Routes.jsx             # Definición de rutas con React Router
 │   ├── rutinas/
 │   │   ├── rutinas.css
-│   │   ├── RutinasCrear.jsx       # Crear rutina con ejercicios (POST /rutinas)
-│   │   ├── RutinasEditar.jsx      # Editar rutina
-│   │   └── RutinasList.jsx        # Listar rutinas (GET /rutinas)
+│   │   ├── RutinasCrear.jsx       # Crear rutina con ejercicios → POST /rutinas
+│   │   ├── RutinasEditar.jsx      # Editar rutina existente → PUT /rutinas/{id}
+│   │   └── RutinasList.jsx        # Listar, editar y eliminar rutinas
 │   ├── App.css
 │   ├── App.jsx                    # Componente raíz
 │   ├── index.css
@@ -77,7 +77,7 @@ rehabilitacion_app/
 
 ---
 
-## ⚙️ Requisitos para ejecutar
+## ⚙️ Requisitos previos
 
 - Node.js >= 18
 - npm >= 9
@@ -89,14 +89,11 @@ rehabilitacion_app/
 
 ```bash
 # 1. Clonar el repositorio
-git clone https://github.com/EvelynMi27/rehabilitacion_app.git
+git clone <https://github.com/EvelynMi27/rehabilitacion_app>
 cd rehabilitacion_app
 
 # 2. Instalar dependencias
 npm install
-
-# 3. Instalar dependencias adicionales (si no están incluidas)
-npm install axios react-router-dom react-icons
 ```
 
 ---
@@ -107,12 +104,17 @@ npm install axios react-router-dom react-icons
 npm run dev
 ```
 
-La app estará disponible en:
-```
-http://localhost:5173
-```
+La app estará disponible en: `http://localhost:5173`
 
 > ⚠️ Asegúrate de que la **MotriCare REST API** esté corriendo en `http://localhost:8000` antes de iniciar la app.
+
+Otros scripts disponibles:
+
+```bash
+npm run build    # Compilar para producción
+npm run preview  # Previsualizar el build
+npm run lint     # Revisar errores de estilo con ESLint
+```
 
 ---
 
@@ -125,9 +127,6 @@ import axios from 'axios';
 
 const api = axios.create({
   baseURL: 'http://localhost:8000/api/v1/MotricareAPI',
-  headers: {
-    'Content-Type': 'application/json',
-  }
 });
 
 // Interceptor: agrega el token Bearer automáticamente en cada petición
@@ -144,48 +143,54 @@ export default api;
 
 ---
 
-## 🖥️ Vistas de la aplicación
+## 🖥️ Vistas y rutas de la aplicación
 
-| Vista | Ruta | Descripción | Rol |
-|-------|------|-------------|-----|
-| Login | `/` | Inicio de sesión | Todos |
-| Registro | `/registro` | Crear cuenta | Todos |
-| Dashboard | `/dash` | Panel principal | Autenticado |
-| Ejercicios | `/ejercicios` | Lista de ejercicios | Autenticado |
-| Crear ejercicio | `/ejercicios/crear` | Formulario nuevo ejercicio | Fisioterapeuta |
-| Rutinas | `/rutinas` | Lista de rutinas | Autenticado |
-| Crear rutina | `/rutinas/crear` | Formulario nueva rutina con ejercicios | Fisioterapeuta |
-| Pacientes | `/pacientes` | Lista de pacientes | Fisioterapeuta |
+| Ruta | Componente | Descripción | Rol |
+|------|------------|-------------|-----|
+| `/` | `login.jsx` | Inicio de sesión | Todos |
+| `/registro` | `register.jsx` | Crear cuenta | Todos |
+| `/dash` | `dashboard.jsx` | Panel principal del fisioterapeuta | `fisio` |
+| `/dash_pac` | `dash_pac.jsx` | Panel del paciente con sus rutinas | `paciente` |
+| `/rutinas` | `RutinasList.jsx` | Listar, editar y eliminar rutinas | `fisio` |
+| `/rutinas/nueva` | `RutinasCrear.jsx` | Crear nueva rutina con ejercicios | `fisio` |
+| `/rutinas/editar/:id` | `RutinasEditar.jsx` | Editar rutina existente | `fisio` |
+| `/pacientes` | `PacientesList.jsx` | Listar y eliminar pacientes | `fisio` |
 
 ---
 
 ## 📡 Endpoints consumidos
 
-| Método | Endpoint | Vista que lo usa |
-|--------|----------|-----------------|
-| POST | `/login` | `login.jsx` |
-| POST | `/registro` | `register.jsx` |
-| GET | `/ejercicios` | `ejerciciosList.jsx`, `RutinasCrear.jsx` |
-| POST | `/ejercicios` | `ejerciciosCrear.jsx` |
-| GET | `/rutinas` | `RutinasList.jsx` |
-| POST | `/rutinas` | `RutinasCrear.jsx` |
-| GET | `/mis-rutinas/{id}` | `dashboard.jsx` |
-| POST | `/asignar-rutina` | `PacientesList.jsx` |
+| Método | Endpoint | Componente que lo usa |
+|--------|----------|-----------------------|
+| `POST` | `/login` | `login.jsx` |
+| `POST` | `/registro` | `register.jsx` |
+| `GET` | `/pacientes` | `PacientesList.jsx`, `RutinasCrear.jsx` |
+| `DELETE` | `/pacientes/{id}` | `PacientesList.jsx` |
+| `GET` | `/rutinas` | `RutinasList.jsx` |
+| `POST` | `/rutinas` | `RutinasCrear.jsx` |
+| `GET` | `/rutinas/{id}` | `RutinasEditar.jsx` |
+| `PUT` | `/rutinas/{id}` | `RutinasEditar.jsx` |
+| `DELETE` | `/rutinas/{id}` | `RutinasList.jsx` |
+| `GET` | `/mis-rutinas/{id}` | `dash_pac.jsx` |
+| `PUT` | `/mis-rutinas/{id_rutina}/completar` | `dash_pac.jsx` |
 
 ---
 
 ## 🔐 Manejo de autenticación
 
-- Al hacer login, el token se guarda en `localStorage` con la clave `token`
-- El interceptor de Axios lo adjunta automáticamente en cada petición
-- Al cerrar sesión se elimina el token del `localStorage`
+- Al hacer login, el token y los datos del usuario se guardan en `localStorage`
+- El interceptor de Axios adjunta el token Bearer automáticamente en cada petición
+- El dashboard del paciente usa el `id` guardado en `localStorage` para cargar sus rutinas
+- Al cerrar sesión se limpia el `localStorage`
 
 ```javascript
-// Guardar token al hacer login
+// Guardar sesión al hacer login
 localStorage.setItem('token', response.data.data.token);
+localStorage.setItem('user', JSON.stringify(response.data.data.user));
 
-// Eliminar token al cerrar sesión
+// Eliminar sesión al cerrar
 localStorage.removeItem('token');
+localStorage.removeItem('user');
 ```
 
 ---
@@ -195,14 +200,31 @@ localStorage.removeItem('token');
 ```
 RutinasCrear.jsx
    │
-   ├─ GET /ejercicios ──► carga lista de ejercicios disponibles desde la API
+   ├─ GET /pacientes ──► carga lista de pacientes para seleccionar
    │
-   │  (fisio selecciona ejercicios y llena el formulario)
+   │  (fisio llena el formulario: título, descripción, selecciona paciente)
+   │  (fisio agrega dinámicamente bloques de ejercicios con nombre, duración, reps y video)
    │
-   └─ POST /rutinas ──► { nombre, descripcion, ejercicios_id: [1, 3, 5] }
+   └─ POST /rutinas ──► { titulo, descripcion, paciente_id, ejercicios: [...] }
                             │
-                            └─ Laravel crea la rutina y asocia ejercicios
-                               en la tabla pivote rutina_ejercicio
+                            └─ API crea la rutina, sus ejercicios y los asocia al paciente
+```
+
+---
+
+## 🎬 Reproducción de videos en el dashboard del paciente
+
+El dashboard del paciente (`dash_pac.jsx`) detecta automáticamente si la URL del ejercicio es de YouTube y la convierte en un `iframe` embebido para reproducción directa:
+
+```javascript
+const getYoutubeEmbedUrl = (url) => {
+  const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+  const match = url.match(regExp);
+  if (match && match[2].length === 11) {
+    return `https://www.youtube.com/embed/${match[2]}`;
+  }
+  return null;
+};
 ```
 
 ---
@@ -211,8 +233,8 @@ RutinasCrear.jsx
 
 | Rol | Acceso |
 |-----|--------|
-| `fisio` | Crear/editar ejercicios y rutinas, asignar rutinas a pacientes |
-| `paciente` | Ver sus rutinas y ejercicios asignados |
+| `fisio` | Crear, editar y eliminar rutinas; gestionar pacientes; asignar rutinas |
+| `paciente` | Ver sus rutinas asignadas, expandir ejercicios y marcarlos como completados |
 
 ---
 
