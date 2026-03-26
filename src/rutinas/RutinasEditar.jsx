@@ -32,13 +32,14 @@ export default function EditarRutina() {
                 // Guardamos la lista de opciones para el select
                 setPacientesLista(resPacientes.data.data || resPacientes.data);
 
-                const dataRutina = resRutina.data.data;
-                setNombre(dataRutina.titulo);
-                setDescripcion(dataRutina.descripcion);
-                setEjercicios(dataRutina.ejercicios || []);
+                const respuestaBackend = resRutina.data.data;
+                const rutinaExcata=respuestaBackend.rutina;
+                setNombre(rutinaExcata.titulo);
+                setDescripcion(rutinaExcata.descripcion);
+                setEjercicios(rutinaExcata.ejercicios || []);
                 
                 // NUEVO: Pre-seleccionamos al paciente actual
-                setPacienteId(dataRutina.paciente_id || "");
+                setPacienteId(respuestaBackend.paciente_id || "");
 
             } catch (error) {
                 console.error("Error al cargar datos", error);
