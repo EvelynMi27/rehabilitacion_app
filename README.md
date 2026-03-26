@@ -89,7 +89,7 @@ rehabilitacion_app/
 
 ```bash
 # 1. Clonar el repositorio
-git clone <https://github.com/EvelynMi27/rehabilitacion_app>
+git clone <url-del-repo>
 cd rehabilitacion_app
 
 # 2. Instalar dependencias
@@ -150,7 +150,7 @@ export default api;
 | `/` | `login.jsx` | Inicio de sesión | Todos |
 | `/registro` | `register.jsx` | Crear cuenta | Todos |
 | `/dash` | `dashboard.jsx` | Panel principal del fisioterapeuta | `fisio` |
-| `/dash_pac` | `dash_pac.jsx` | Panel del paciente con sus rutinas | `paciente` |
+| `/dash_pac` | `dash_pac.jsx` | Panel del paciente: ver rutinas asignadas, expandir ejercicios con video, marcar como completados y cerrar sesión | `paciente` |
 | `/rutinas` | `RutinasList.jsx` | Listar, editar y eliminar rutinas | `fisio` |
 | `/rutinas/nueva` | `RutinasCrear.jsx` | Crear nueva rutina con ejercicios | `fisio` |
 | `/rutinas/editar/:id` | `RutinasEditar.jsx` | Editar rutina existente | `fisio` |
