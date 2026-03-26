@@ -89,7 +89,7 @@ rehabilitacion_app/
 
 ```bash
 # 1. Clonar el repositorio
-git clone <url-del-repo>
+git clone <https://github.com/EvelynMi27/rehabilitacion_app>
 cd rehabilitacion_app
 
 # 2. Instalar dependencias
