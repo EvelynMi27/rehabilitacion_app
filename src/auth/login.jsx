@@ -23,6 +23,7 @@ export default function LoginPage() {
             localStorage.setItem('token', response.data.data.token);
             const rolUsuario=response.data.data.user.rol;
             localStorage.setItem('rol', rolUsuario);
+            localStorage.setItem('user', JSON.stringify(response.data.data.user));
             if(rolUsuario==='fisio'){
                 navigate("/dash");
             }else if(rolUsuario === 'paciente'){

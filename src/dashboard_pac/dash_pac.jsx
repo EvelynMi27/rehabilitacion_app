@@ -1,85 +1,72 @@
-import { useState } from "react";
-import { FaCheckCircle, FaCircle, FaDumbbell, FaClock, FaFire, FaChevronDown, FaChevronUp } from "react-icons/fa";
+import { useState, useEffect } from "react";
+import { FaCheckCircle, FaCircle, FaDumbbell, FaClock, FaFire, FaChevronDown, FaChevronUp, FaSignOutAlt } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
+import api from "../api/axios";
 import './paciente.css';
 
-// Datos de ejemplo
-const rutinasMock = [
-  {
-    id: 1,
-    nombre: "Rutina de fuerza - Tren superior",
-    descripcion: "Fortalecimiento de hombros, pecho y brazos.",
-    duracion: "45 min",
-    calorias: "320 kcal",
-    completada: false,
-    ejercicios: [
-      { id: 101, nombre: "Press de banca", series: 3, repeticiones: 12, completado: false },
-      { id: 102, nombre: "Remo con mancuerna", series: 3, repeticiones: 10, completado: false },
-      { id: 103, nombre: "Elevaciones laterales", series: 3, repeticiones: 15, completado: false },
-    ],
-  },
-  {
-    id: 2,
-    nombre: "Movilidad y flexibilidad",
-    descripcion: "Sesión suave de estiramientos y movilidad articular.",
-    duracion: "30 min",
-    calorias: "120 kcal",
-    completada: false,
-    ejercicios: [
-      { id: 201, nombre: "Estiramiento de cadera", series: 2, repeticiones: 60, completado: false },
-      { id: 202, nombre: "Rotación de hombros", series: 2, repeticiones: 20, completado: false },
-    ],
-  },
-  {
-    id: 3,
-    nombre: "Cardio intervalado",
-    descripcion: "HIIT de baja intensidad para mejorar resistencia.",
-    duracion: "25 min",
-    calorias: "280 kcal",
-    completada: true,
-    ejercicios: [
-      { id: 301, nombre: "Jumping jacks", series: 4, repeticiones: 30, completado: true },
-      { id: 302, nombre: "Sentadillas con salto", series: 4, repeticiones: 15, completado: true },
-    ],
-  },
-];
+const getYoutubeEmbedUrl=(url)=>{
+    if(!url) return null;
+    const regExp= /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+    const match=url.match(regExp);
+    if(match && match[2].length ===11){
+        return `https://www.youtube.com/embed/${match[2]}`;
+    }
+    return null;
+}
 
 export default function PacienteDashboardPage() {
-  const [rutinas, setRutinas] = useState(rutinasMock);
+  const [rutinas, setRutinas] = useState([]);
   const [expandida, setExpandida] = useState(null);
+  const[cargando, setCargando]=useState(true);
+const navigate=useNavigate();
+  useEffect(()=>{
+    const cargarMisRutinas= async()=>{
+        try{
+            const user = JSON.parse(localStorage.getItem('user'));
+            if(!user || !user.id){
+                console.error("No se encontro usuario en sesion");
+                navigate("/");
+                return;
+            }
+            const response=await api.get(`/mis-rutinas/${user.id}`);
+            setRutinas(response.data.data || []);
+        }catch(error){
+            console.error("Error al cargar mis rutinas",error);
+        }finally{
+            setCargando(false);
+        }
+    };
+    cargarMisRutinas();
+  },[navigate]);
 
   const toggleExpand = (id) => {
     setExpandida((prev) => (prev === id ? null : id));
   };
 
   const marcarEjercicio = (rutinaId, ejercicioId) => {
-    setRutinas((prev) =>
-      prev.map((r) => {
+    setRutinas((prev) =>{
+      const rutinasActualizadas=prev.map((r) => {
         if (r.id !== rutinaId) return r;
         const ejerciciosActualizados = r.ejercicios.map((e) =>
           e.id === ejercicioId ? { ...e, completado: !e.completado } : e
         );
         const todasCompletas = ejerciciosActualizados.every((e) => e.completado);
         return { ...r, ejercicios: ejerciciosActualizados, completada: todasCompletas };
-      })
-    );
+      });
+      return rutinasActualizadas.filter((r)=>!r.completada);
+  });
   };
 
-  const marcarRutinaCompleta = (rutinaId) => {
-    setRutinas((prev) =>
-      prev.map((r) => {
-        if (r.id !== rutinaId) return r;
-        const nuevoEstado = !r.completada;
-        return {
-          ...r,
-          completada: nuevoEstado,
-          ejercicios: r.ejercicios.map((e) => ({ ...e, completado: nuevoEstado })),
-        };
-      })
-    );
+  const handleLogout=()=>{
+    const confirmar= window.confirm("¿Estas seguro de cerrar sesion?");
+    if(confirmar){
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
+        navigate("/");
+    }
   };
 
-  const completadas = rutinas.filter((r) => r.completada).length;
-  const progreso = Math.round((completadas / rutinas.length) * 100);
+  if(cargando) return <p style={{textAlign: 'center', marginTop: '50px'}}>Cargando tus rutinas de hoy...</p>
 
   return (
     <>
@@ -89,97 +76,109 @@ export default function PacienteDashboardPage() {
         <div className="pac-header">
           <div>
             <p className="pac-saludo">¡Hola de nuevo 👋</p>
-            <h1 className="pac-titulo">Mis rutinas asignadas</h1>
+            <h1 className="pac-titulo">Mis rutinas pendientes</h1>
           </div>
-          <div className="pac-progreso-wrap">
-            <span className="pac-progreso-label">{completadas}/{rutinas.length} completadas</span>
-            <div className="pac-barra-bg">
-              <div className="pac-barra-fill" style={{ width: `${progreso}%` }} />
-            </div>
-            <span className="pac-progreso-pct">{progreso}%</span>
-          </div>
+          <button 
+            onClick={handleLogout} 
+            style={{ 
+                display: 'flex', alignItems: 'center', gap: '8px', 
+                padding: '8px 15px', backgroundColor: '#dc3545', 
+                color: 'white', border: 'none', borderRadius: '5px', 
+                cursor: 'pointer', fontWeight: 'bold' 
+            }}
+          >
+            <FaSignOutAlt /> Salir
+          </button>
         </div>
 
         {/* LISTA DE RUTINAS */}
         <div className="pac-lista">
-          {rutinas.map((rutina) => {
-            const abierta = expandida === rutina.id;
-            const ejs = rutina.ejercicios;
-            const ejsCompletos = ejs.filter((e) => e.completado).length;
+          {rutinas.length === 0 ? (
+            <div className="pac-felicidades">
+              🎉 ¡No tienes rutinas pendientes! ¡Excelente trabajo!
+            </div>
+          ) : (
+            rutinas.map((rutina) => {
+              const abierta = expandida === rutina.id;
+              const ejs = rutina.ejercicios || [];
+              const ejsCompletos = ejs.filter((e) => e.completado).length;
 
-            return (
-              <div
-                key={rutina.id}
-                className={`pac-card ${rutina.completada ? "pac-card--completa" : ""}`}
-              >
-                {/* CABECERA DE LA TARJETA */}
-                <div className="pac-card-header">
-                  <button
-                    className="pac-check-btn"
-                    onClick={() => marcarRutinaCompleta(rutina.id)}
-                    title={rutina.completada ? "Marcar como pendiente" : "Marcar como completa"}
-                  >
-                    {rutina.completada
-                      ? <FaCheckCircle className="pac-icon-check pac-icon-check--done" />
-                      : <FaCircle className="pac-icon-check pac-icon-check--pending" />}
-                  </button>
-
-                  <div className="pac-card-info" onClick={() => toggleExpand(rutina.id)}>
-                    <h3 className={`pac-card-nombre ${rutina.completada ? "tachado" : ""}`}>
-                      {rutina.nombre}
-                    </h3>
-                    <p className="pac-card-desc">{rutina.descripcion}</p>
-                    <div className="pac-meta">
-                      <span><FaClock className="meta-icon" /> {rutina.duracion}</span>
-                      <span><FaFire className="meta-icon" /> {rutina.calorias}</span>
-                      <span><FaDumbbell className="meta-icon" /> {ejsCompletos}/{ejs.length} ejercicios</span>
-                    </div>
-                  </div>
-
-                  <button className="pac-expand-btn" onClick={() => toggleExpand(rutina.id)}>
-                    {abierta ? <FaChevronUp /> : <FaChevronDown />}
-                  </button>
-                </div>
-
-                {/* MINI BARRA DE EJERCICIOS */}
-                <div className="pac-mini-barra-bg">
-                  <div
-                    className="pac-mini-barra-fill"
-                    style={{ width: `${ejs.length ? (ejsCompletos / ejs.length) * 100 : 0}%` }}
-                  />
-                </div>
-
-                {/* EJERCICIOS DESPLEGABLES */}
-                {abierta && (
-                  <div className="pac-ejercicios">
-                    {ejs.map((ej) => (
-                      <div
-                        key={ej.id}
-                        className={`pac-ejercicio ${ej.completado ? "pac-ejercicio--done" : ""}`}
-                        onClick={() => marcarEjercicio(rutina.id, ej.id)}
-                      >
-                        <span className="pac-ej-check">
-                          {ej.completado
-                            ? <FaCheckCircle className="pac-icon-check pac-icon-check--done pac-icon-sm" />
-                            : <FaCircle className="pac-icon-check pac-icon-check--pending pac-icon-sm" />}
-                        </span>
-                        <span className={`pac-ej-nombre ${ej.completado ? "tachado" : ""}`}>{ej.nombre}</span>
-                        <span className="pac-ej-detalle">{ej.series} series × {ej.repeticiones} reps</span>
+              return (
+                <div key={rutina.id} className="pac-card">
+                  {/* CABECERA DE LA TARJETA */}
+                  <div className="pac-card-header" onClick={() => toggleExpand(rutina.id)} style={{cursor: 'pointer'}}>
+                    <div className="pac-card-info">
+                      <h3 className="pac-card-nombre">
+                        {rutina.nombre}
+                      </h3>
+                      <p className="pac-card-desc">{rutina.descripcion}</p>
+                      <div className="pac-meta">
+                        <span><FaClock className="meta-icon" /> {rutina.duracion}</span>
+                        <span><FaDumbbell className="meta-icon" /> {ejsCompletos}/{ejs.length} ejercicios</span>
                       </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            );
-          })}
-        </div>
+                    </div>
 
-        {/* MENSAJE CUANDO TODO ESTÁ COMPLETO */}
-        {progreso === 100 && (
-          <div className="pac-felicidades">
-            🎉 ¡Completaste todas tus rutinas del día! ¡Excelente trabajo!
-          </div>
-        )}
+                    <button className="pac-expand-btn">
+                      {abierta ? <FaChevronUp /> : <FaChevronDown />}
+                    </button>
+                  </div>
+
+                  {/* MINI BARRA DE EJERCICIOS */}
+                  <div className="pac-mini-barra-bg">
+                    <div
+                      className="pac-mini-barra-fill"
+                      style={{ width: `${ejs.length ? (ejsCompletos / ejs.length) * 100 : 0}%` }}
+                    />
+                  </div>
+
+                  {/* EJERCICIOS DESPLEGABLES CON VIDEO */}
+                  {abierta && (
+                    <div className="pac-ejercicios">
+                      {ejs.map((ej) => {
+                        const embedUrl = getYoutubeEmbedUrl(ej.video_url);
+
+                        return (
+                          <div key={ej.id} className={`pac-ejercicio ${ej.completado ? "pac-ejercicio--done" : ""}`} style={{ flexDirection: 'column', alignItems: 'flex-start' }}>
+                            
+                            {/* Información del Ejercicio */}
+                            <div style={{ display: 'flex', width: '100%', alignItems: 'center', cursor: 'pointer' }} onClick={() => marcarEjercicio(rutina.id, ej.id)}>
+                                <span className="pac-ej-check">
+                                {ej.completado
+                                    ? <FaCheckCircle className="pac-icon-check pac-icon-check--done pac-icon-sm" />
+                                    : <FaCircle className="pac-icon-check pac-icon-check--pending pac-icon-sm" />}
+                                </span>
+                                <div style={{flex: 1}}>
+                                    <span className={`pac-ej-nombre ${ej.completado ? "tachado" : ""}`} style={{display: 'block'}}>{ej.nombre}</span>
+                                    {ej.descripcion && <span style={{fontSize: '0.85rem', color: '#666'}}>{ej.descripcion}</span>}
+                                </div>
+                                <span className="pac-ej-detalle">{ej.duracion}s | {ej.repeticiones} reps</span>
+                            </div>
+
+                            {/* REPRODUCTOR DE VIDEO (Si tiene URL) */}
+                            {embedUrl && (
+                                <div style={{ width: '100%', marginTop: '15px', borderRadius: '8px', overflow: 'hidden' }}>
+                                    <iframe 
+                                        width="100%" 
+                                        height="200" 
+                                        src={embedUrl} 
+                                        title={ej.nombre} 
+                                        frameBorder="0" 
+                                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                                        allowFullScreen
+                                    ></iframe>
+                                </div>
+                            )}
+
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              );
+            })
+          )}
+        </div>
       </div>
     </>
   );
