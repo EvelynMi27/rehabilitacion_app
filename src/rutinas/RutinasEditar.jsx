@@ -6,28 +6,39 @@ import api from "../api/axios";
 import './rutinas.css';
 
 export default function EditarRutina() {
-    const { id } = useParams(); // ID de la rutina desde la URL
+    const { id } = useParams();
     const navigate = useNavigate();
 
-    // Estados de la Rutina
     const [nombre, setNombre] = useState("");
     const [descripcion, setDescripcion] = useState("");
     
-    // Estado para los ejercicios (existentes con id_ejer o nuevos con id_temp)
+    // NUEVO: Estados para manejar el paciente
+    const [pacienteId, setPacienteId] = useState("");
+    const [pacientesLista, setPacientesLista] = useState([]);
+
     const [ejercicios, setEjercicios] = useState([]);
-    const [ejerciciosBorrarIds, setEjerciciosBorrarIds] = useState([]); // Rastrea los que eliminamos
+    const [ejerciciosBorrarIds, setEjerciciosBorrarIds] = useState([]); 
     const [cargando, setCargando] = useState(true);
 
-    // 1. CARGAMOS LOS DATOS (¡Sin buscar el catálogo de /ejercicios!)
     useEffect(() => {
         const cargarDatos = async () => {
             try {
-                const response = await api.get(`/rutinas/${id}`);
-                const dataRutina = response.data.data;
+                // Hacemos las dos peticiones al mismo tiempo para que cargue más rápido
+                const [resPacientes, resRutina] = await Promise.all([
+                    api.get('/pacientes'),
+                    api.get(`/rutinas/${id}`)
+                ]);
 
+                // Guardamos la lista de opciones para el select
+                setPacientesLista(resPacientes.data.data || resPacientes.data);
+
+                const dataRutina = resRutina.data.data;
                 setNombre(dataRutina.titulo);
                 setDescripcion(dataRutina.descripcion);
                 setEjercicios(dataRutina.ejercicios || []);
+                
+                // NUEVO: Pre-seleccionamos al paciente actual
+                setPacienteId(dataRutina.paciente_id || "");
 
             } catch (error) {
                 console.error("Error al cargar datos", error);
@@ -40,7 +51,6 @@ export default function EditarRutina() {
         cargarDatos();
     }, [id, navigate]);
 
-    // Agregar un bloque nuevo vacío
     const agregarBloqueEjercicioNuevo = () => {
         setEjercicios([
             ...ejercicios,
@@ -48,7 +58,6 @@ export default function EditarRutina() {
         ]);
     };
 
-    // Quitar bloque de la vista (y anotarlo para borrar en BD si ya existía)
     const quitarBloqueEjercicio = (ejercicioTarget) => {
         if (ejercicioTarget.id_ejer) {
             setEjerciciosBorrarIds([...ejerciciosBorrarIds, ejercicioTarget.id_ejer]);
@@ -59,7 +68,6 @@ export default function EditarRutina() {
         }));
     };
 
-    // Actualizar campos
     const handleEjercicioChange = (identifier, isNew, campo, valor) => {
         const nuevosEjercicios = ejercicios.map(ej => {
             const match = isNew ? (ej.id_temp === identifier) : (ej.id_ejer === identifier);
@@ -71,9 +79,9 @@ export default function EditarRutina() {
         setEjercicios(nuevosEjercicios);
     };
 
-    // Guardar en Laravel
     const guardarCambios = async () => {
         if (!nombre.trim()) return alert("El nombre de la rutina es obligatorio");
+        if (!pacienteId) return alert("Debes seleccionar a un paciente"); // Validación de paciente
         if (ejercicios.length === 0) return alert("La rutina debe tener al menos un ejercicio");
 
         const ejerciciosIncompletos = ejercicios.some(ej => !ej.nombre.trim() || !ej.duracion || !ej.repeticiones);
@@ -83,6 +91,7 @@ export default function EditarRutina() {
             const payload = {
                 titulo: nombre,
                 descripcion: descripcion,
+                paciente_id: Number(pacienteId), // NUEVO: Mandamos el paciente actualizado
                 ejercicios: ejercicios, 
                 ejercicios_borrar_ids: ejerciciosBorrarIds 
             };
@@ -123,6 +132,25 @@ export default function EditarRutina() {
                             <label>Nombre de la rutina *</label>
                             <input type="text" value={nombre} onChange={(e) => setNombre(e.target.value)} className="form-input" />
                         </div>
+                        
+                        {/* NUEVO: SELECT PARA CAMBIAR DE PACIENTE */}
+                        <div className="form-group">
+                            <label>Paciente asignado *</label>
+                            <select 
+                                className="form-input" 
+                                value={pacienteId} 
+                                onChange={(e) => setPacienteId(e.target.value)}
+                                style={{ cursor: 'pointer', backgroundColor: 'white', color: '#000' }}
+                            >
+                                <option value="" disabled>-- Seleccione un paciente --</option>
+                                {pacientesLista.map(paciente => (
+                                    <option key={paciente.id} value={paciente.id}>
+                                        {paciente.name}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+
                         <div className="form-group">
                             <label>Descripción</label>
                             <textarea value={descripcion} onChange={(e) => setDescripcion(e.target.value)} className="form-input form-textarea" />

@@ -23,10 +23,18 @@ export default function PacientesList() {
     }, []);
 
     // FUNCIÓN PARA ELIMINAR UN PACIENTE --ELIMINAR SI NO ES NECESARIA
-    const eliminarPaciente = (id) => {
+    const eliminarPaciente = async (id) => {
         const confirmar = window.confirm("¿Estás segura de eliminar este paciente?");
         if (confirmar) {
-            setPacientes(pacientes.filter((paciente) => paciente.id !== id));
+            try{
+                await api.delete(`/pacientes/${id}`);
+                setPacientes(pacientes.filter((paciente) => paciente.id !== id));
+                alert('Paciente eliminado correctamente');
+            }catch(error){
+                console.error("Error al eliminar", error);
+                alert("Hubo un error al eliminar paciente");
+            }
+            
         }
     };
 
@@ -63,10 +71,6 @@ export default function PacientesList() {
                                 <td>{paciente.rutinas_asignadas?.length || 0} rutinas</td>
 
                                 <td className="acciones">
-                                    {/* BOTÓN EDITAR RUTINAS — solo se puede editar las rutinas asignadas */}
-                                    <a href={`/pacientes/editar/${paciente.id}`} className="btn-editar">
-                                        <FaEdit /> Editar rutinas
-                                    </a>
                                     {/* BOTÓN ELIMINAR */}
                                     <button className="btn-eliminar" onClick={() => eliminarPaciente(paciente.id)}>
                                         <FaTrash /> Eliminar
